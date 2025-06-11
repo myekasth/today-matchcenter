@@ -43,7 +43,7 @@
             // 3. Δημιούργησε τη συμβολοσειρά του QUERY
             strQueryForURI = `select * where D = date '${formattedDate}' order by D,B,A,E`;
 
-            //-- console.log(strQueryForURI);
+            //--- console.log(strQueryForURI);
 
             queryString = encodeURIComponent(strQueryForURI);
             // Replace with your actual Google Sheet ID
@@ -60,6 +60,7 @@
             }
             data = response.getDataTable(); // Assign to global 'data'
             posesEggrafes = data.getNumberOfRows(); // Assign to global 'posesEggrafes'
+            //--- console.log('handle_DrawDiorganvseis_DataQueryResponse posesEggrafes :' +posesEggrafes);
 
             // Global variables for tab state (moved here from inside functions)
             let curOmilosKathgoria_prg = "";
@@ -67,13 +68,22 @@
             let curOmilosKathgoria_orismoi = "";
             let curAgvnistikh_orismoi = "";
 
+            //--- trexei agvnes-apotelesmata mia fora arxika kai gemizei antistoixo tab
             renderMatches('pills-prg-container-id');
-
             document.getElementById('pills-prg').classList.add('active');
             document.getElementById('pills-prg').classList.add('show');
-            // document.getElementById('pills-orismoi').classList.remove()
+
+            //--- trexei orismous mia fora arxika kai gemizei antistoixo tab
+            document.getElementById('pills-orismoi').classList.add('active');
+            document.getElementById('pills-orismoi').classList.add('show');
+            renderOrismoi('pills-orismoi-container-id');
+            document.getElementById('pills-orismoi').classList.remove('active');
+            document.getElementById('pills-orismoi').classList.remove('show');
+
 
         }   //--- END of function handle_DrawDiorganvseis_DataQueryResponse(response)
+
+        //---
 
 
         // --- Συνάρτηση για τη δημιουργία αγώνων (για το tab 'ΑΓΩΝΕΣ') ---
@@ -91,6 +101,9 @@
                 curAgvnistikh_prg = "";
 
                 for (let row = 0; row < posesEggrafes; row++) {
+
+                    // metablhth gia to όταν υπάρχει ΡΕΠΟ σε μια ομάδα να μην εμφανίζεται το γηπεδο
+                    var isRepo=false;                    
 
                     // --- Στοιχεία Κατηγορίας/Ομίλου ---
                     if (curOmilosKathgoria_prg !== data.getFormattedValue(row, 0)) {
@@ -137,6 +150,7 @@
 
                     if (teamAValue === "-" || teamBValue === "-") {
                         iDivAgvnas.innerHTML = '<div class="col MatchListItem__header"><span class="MatchListItem__date">' + formattedDate + '</span> <span class="MatchListItem__time">Ρ Ε Π Ο </span></div>';
+                        isRepo=true
                     } else if (statusValue === "ΤΕΛΙΚΟ") {
                         iDivAgvnas.innerHTML = '<div class="col MatchListItem__header"><span class="MatchListItem__date"> ΤΕΛΙΚΟ </span> </div>';
                     } else if (statusValue === "ΑΑ") {
@@ -149,6 +163,21 @@
                  // --- λογοτυπα Ομάδες και Σκορ Αγώνα ---
                     let matchContentDiv = document.createElement('div');
                     matchContentDiv.classList.add('MatchListItem__content');
+
+
+                    //---- ghpedo panv apo omada A
+                    if(!isRepo){                     
+                        let ghpedoDiv = document.createElement('div');
+                        ghpedoDiv.classList.add('MatchListItem__Ghpedo');
+
+                        let ghpedoNameSpan = document.createElement('span');
+                        ghpedoNameSpan.classList.add('MatchListItem__ghpedoName');
+                        ghpedoNameSpan.textContent = data.getFormattedValue(row, 5);   
+
+                        ghpedoDiv.appendChild(ghpedoNameSpan);
+                        matchContentDiv.appendChild(ghpedoDiv);
+                    }                
+                    //---- omada A + omada B kai neo css
 
                     let homeTeamDiv = document.createElement('div');
                     homeTeamDiv.classList.add('MatchListItem__team', 'MatchListItem__team--home');
@@ -177,7 +206,7 @@
                     let homeTeamScoreSpan = document.createElement('span');
                     homeTeamScoreSpan.classList.add('MatchListItem__teamScore');
                     const homeScore = parseFloat(data.getFormattedValue(row, 8)); // Μετατροπή σε αριθμό
-                    homeTeamScoreSpan.textContent = isNaN(homeScore) ? '-' : homeScore; // Εμφάνιση παύλας αν δεν είναι αριθμός
+                    homeTeamScoreSpan.textContent = isNaN(homeScore) ? '' : homeScore; // Εμφάνιση παύλας αν δεν είναι αριθμός
 
                     homeTeamDiv.appendChild(homeTeamNameSpan);
                     homeTeamDiv.appendChild(homeTeamScoreSpan);
@@ -239,8 +268,6 @@
                 parentElement.innerHTML = '';
 
 
-
-
                 // Επαναφέρουμε τις μεταβλητές κατάστασης για αυτό το tab
                 curOmilosKathgoria_orismoi = "";
                 curAgvnistikh_orismoi = "";
@@ -285,9 +312,10 @@
                         const monthAbbr = greekMonthsAbbr[dateObject.getMonth()];
                         formattedDate = `${day} ${monthAbbr}`;
                     }
+    
 
                     let iDivAgvnas = document.createElement('div');
-                    iDivAgvnas.id = 'agvnas-orismoi-div-' + row;
+                    iDivAgvnas.id = 'agvnas-prg-div-' + row;
                     iDivAgvnas.className = 'row MatchListItem__wrapper MatchList__match';
 
                     const teamAValue = data.getFormattedValue(row, 6);
@@ -306,9 +334,26 @@
                     }
                     parentElement.appendChild(iDivAgvnas);
 
-                // --- λογοτυπα Ομάδες και Σκορ Αγώνα ---
+
+                // --- λογοτυπα Ομάδες και Σκορ Αγώνα ---]
+
                     let matchContentDiv = document.createElement('div');
                     matchContentDiv.classList.add('MatchListItem__content');
+
+                    //---- ghpedo panv apo omada A
+                    if(!isRepo){                    
+                        let ghpedoDiv = document.createElement('div');
+                        ghpedoDiv.classList.add('MatchListItem__Ghpedo');
+
+                        let ghpedoNameSpan = document.createElement('span');
+                        ghpedoNameSpan.classList.add('MatchListItem__ghpedoName');
+                        ghpedoNameSpan.textContent = data.getFormattedValue(row, 5);   
+
+                        ghpedoDiv.appendChild(ghpedoNameSpan);
+                        matchContentDiv.appendChild(ghpedoDiv);
+                    }
+                                        
+                    //---- omada A + omada B
 
                     let homeTeamDiv = document.createElement('div');
                     homeTeamDiv.classList.add('MatchListItem__team', 'MatchListItem__team--home');
@@ -337,7 +382,7 @@
                     let homeTeamScoreSpan = document.createElement('span');
                     homeTeamScoreSpan.classList.add('MatchListItem__teamScore');
                     const homeScore = parseFloat(data.getFormattedValue(row, 8)); // Μετατροπή σε αριθμό
-                    homeTeamScoreSpan.textContent = isNaN(homeScore) ? '-' : homeScore; // Εμφάνιση παύλας αν δεν είναι αριθμός
+                    homeTeamScoreSpan.textContent = isNaN(homeScore) ? '' : homeScore; // Εμφάνιση παύλας αν δεν είναι αριθμός
 
                     homeTeamDiv.appendChild(homeTeamNameSpan);
                     homeTeamDiv.appendChild(homeTeamScoreSpan);
@@ -439,7 +484,7 @@
 
                     // --- β. Κομισάριος (Column 2) ---
                     let komisariosCol = document.createElement('div');
-                    komisariosCol.classList.add('col-md-4', 'col-sm-12');
+                    komisariosCol.classList.add('col-md-4', 'col-sm-12', 'komisarios-column-to-hide');
 
                     let komisariosDiv = document.createElement('div');
                     komisariosDiv.classList.add('MatchListItem__section-title');
@@ -512,54 +557,6 @@
                 }
         }
 
- 
-        // --- Event Listeners για τα Tabs ---
-        document.addEventListener('DOMContentLoaded', function () {
-
-
-                const pillsPrgTab = document.getElementById('pills-prg-tab');
-                const pillsOrismoiTab = document.getElementById('pills-orismoi-tab');
-
-                if (pillsPrgTab) {
-                    pillsPrgTab.addEventListener('shown.bs.tab', function (event) {
-                        renderMatches('pills-prg-container-id');
-                    });
-                }
-
-                if (pillsOrismoiTab) {
-                    pillsOrismoiTab.addEventListener('shown.bs.tab', function (event) {
-                        renderOrismoi('pills-orismoi-container-id');
-                    });
-                }
-
-                // Initial render for the active tab when the data is loaded
-                if (document.querySelector('#pills-prg.show.active')) {
-                    renderMatches('pills-prg-container-id');
-                }
-
-
-                /// ---- na ta snhsv an trrexei
-
-                ///--- 
-                /*
-                // 1. Get a reference to the button element
-                const matchesButton = document.getElementById('pills-prg-tab');
-
-                // 2. Check if the button exists to prevent errors
-                if (matchesButton) {
-                    // 3. Simulate the click
-                    matchesButton.click();
-                    console.log('Simulated click on "ΑΓΩΝΕΣ" button.');
-                } else {
-                    console.warn('Button with ID "pills-prg-tab" not found.');
-                }
-*/
-                
-        });
-            
-          
-
-
     </script>
 
     <style>
@@ -605,14 +602,21 @@
         }
 
         .MatchListItem__wrapper {
-            align-items: stretch;
             border-bottom: 4px solid #e2e4e6;
             display: flex;
+            align-items: stretch;
             justify-content: flex-start;
             padding: 10px 0;
             text-decoration: none;
             flex-wrap: wrap; /* Allows wrapping for orismoi details */
         }
+
+        .MatchListItem__wrapper:hover{
+            background-color: rgb(248, 248, 248);
+            outline: none;
+            user-select :auto;
+            cursor: pointer;            
+        }        
 
         .MatchListItem__header {
             display: flex;
@@ -643,6 +647,19 @@
             line-height: 0.8;
         }
 
+        /* --- ΓΗΠΕΔΟ -- */
+
+        .MatchListItem__Ghpedo{
+            margin-bottom: 5px;
+            text-align: right;
+        }
+        .MatchListItem__ghpedoName{
+            font-size: 11px;
+            font-weight: 400;
+            letter-spacing: 0.15em;
+            box-shadow: 0px 0px 4px 4px rgba(0, 0, 0, 0.08);
+        }
+
         /* --- ΟΜΑΔΕΣ ΑΓΩΝΑ -- */
         .MatchListItem__content {
             flex: 1;
@@ -667,6 +684,8 @@
         .MatchListItem__teamName {
             margin-right: auto;
         }
+
+
 
         .MatchListItem__teamName,
         .MatchListItem__teamScore {
@@ -720,27 +739,64 @@
             margin-bottom: 10px;
             padding-left: 0;
         }
+
+        .sticky-header-tabs {
+            position: fixed; /* Κάνει το στοιχείο να παραμένει στην οθόνη ακόμα και με scroll */
+            top: 0;          /* Κολλάει στην κορυφή του viewport */
+            width: 100%;     /* Καλύπτει όλο το πλάτος του viewport */
+            background-color: #fff; /* Ορίζουμε background-color για να μην "φαίνεται" το περιεχόμενο από κάτω */
+            z-index: 1000;   /* Διασφαλίζει ότι θα εμφανίζεται πάνω από άλλα στοιχεία */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Προαιρετικό: προσθήκη σκιάς για καλύτερη οπτική διαχωρισμό */
+        }
+
+        /* Πρέπει να προσθέσουμε padding στο περιεχόμενο για να μην κρύβεται κάτω από το fixed header */
+        .tab-content {
+            /* Δώστε padding-top ίσο ή λίγο μεγαλύτερο από το συνολικό ύψος του sticky-header-tabs */
+            /* Πρέπει να υπολογίσετε το ύψος του header και των tabs.
+            Ενδεικτικά, ας υποθέσουμε ότι είναι περίπου 100px. Θα χρειαστείτε προσαρμογή. */
+            padding-top: 150px; /* Προσαρμόστε αυτό το ύψος ανάλογα με το πραγματικό ύψος του header+tabs */
+        }
+
+        /* Προαιρετικά: Αν το .MatchcenterHomepageWidget έχει background-color, βεβαιωθείτε ότι το .sticky-header-tabs είναι το ίδιο ή διαφανές */
+        .MatchcenterHomepageWidget {
+            /* Εάν είχε background-color, ίσως να το αφαιρέσετε από εδώ ή να το ρυθμίσετε διαφορετικά */
+            padding-top: 0; /* Αφαιρέστε τυχόν padding-top από εδώ αν το βάλετε στο tab-content */
+        }
+            
+
+        /* Κρύψτε το Komisarios column σε οθόνες μικρότερες από το μέσο breakpoint (π.χ. 768px) */
+        @media (max-width: 767.98px) { /* Το 767.98px είναι το breakpoint του Bootstrap για sm προς md */
+            .komisarios-column-to-hide.invisible { /* Θα προσθέσουμε αυτή την κλάση με JS, ή απλά στοχεύστε το komisariosCol */
+                display: none !important; /* Χρησιμοποιήστε !important αν χρειάζεται να παρακάμψετε άλλους κανόνες */
+            }
+        }
+
+
     </style>
 
 </head>
 <body>
 
 
+
     <div class="MatchCenterWidgetContainer">
         <div class="MatchcenterWidget MatchcenterWidget--hp" id="matchcenter-homepage-widget" data-matchcenter-homepage-group="" data-matchcenter-homepage-b-group="">
             <section class="MatchcenterHomepageWidget">
-                <h3 class="MatchcenterHomepageWidget__header">
-                    MATCH<small class="text-body-secondary">CENTER</small>
-                </h3>
 
-                <ul class="nav nav-pills mb-3 justify-content-center" id="pills-tab" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="pills-prg-tab" data-bs-toggle="pill" data-bs-target="#pills-prg" type="button" role="tab" aria-controls="pills-prg" aria-selected="false">ΑΓΩΝΕΣ</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="pills-orismoi-tab" data-bs-toggle="pill" data-bs-target="#pills-orismoi" type="button" role="tab" aria-controls="pills-orismoi" aria-selected="true">ΟΡΙΣΜΟΙ</button>
-                    </li>
-                </ul>
+                <div class="sticky-header-tabs">
+                    <h3 class="MatchcenterHomepageWidget__header">
+                        MATCH<small class="text-body-secondary">CENTER</small>
+                    </h3>
+
+                    <ul class="nav nav-pills mb-3 justify-content-center" id="pills-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="pills-prg-tab" data-bs-toggle="pill" data-bs-target="#pills-prg" type="button" role="tab" aria-controls="pills-prg" aria-selected="false">ΑΓΩΝΕΣ</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pills-orismoi-tab" data-bs-toggle="pill" data-bs-target="#pills-orismoi" type="button" role="tab" aria-controls="pills-orismoi" aria-selected="true">ΟΡΙΣΜΟΙ</button>
+                        </li>
+                    </ul>
+                </div>
                 <div class="tab-content" id="pills-tabContent">
                     <div class="tab-pane fade" id="pills-prg" role="tabpanel" aria-labelledby="pills-prg-tab" tabindex="-1">
                         <div class="container text-center" id="pills-prg-container-id">PRG
@@ -758,40 +814,8 @@
         </div>
     </div>
 
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
-    <script>
-//=============
 
-    // --- Event Listeners για τα Tabs ---
-    /*
-    document.addEventListener('DOMContentLoaded', function () {
-        const pillsPrgTab = document.getElementById('pills-prg-tab');
-        const pillsOrismoiTab = document.getElementById('pills-orismoi-tab');
-
-        if (pillsPrgTab) {
-            pillsPrgTab.addEventListener('shown.bs.tab', function (event) {
-                renderMatches('pills-prg-container-id');
-            });
-        }
-
-        if (pillsOrismoiTab) {
-            pillsOrismoiTab.addEventListener('shown.bs.tab', function (event) {
-                renderOrismoi('pills-orismoi-container-id');
-            });
-        }
-
-        // Καλείται την πρώτη φορά που φορτώνεται η σελίδα για το ενεργό tab
-        // Βεβαιωθείτε ότι καλείται η σωστή συνάρτηση για το αρχικά ενεργό tab
-        // (Σε αυτό το HTML, το 'pills-prg' είναι το active tab)
-        if (document.querySelector('#pills-prg.show.active')) {
-            renderMatches('pills-prg-container-id'); // <-- Αυτή η γραμμή το κάνει ήδη!
-        }
-    });
-
-    */
-
-
-//=============
-    </script>
 </body>
 </html>
