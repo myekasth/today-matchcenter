@@ -90,6 +90,22 @@
             document.getElementById('pills-orismoi').classList.remove('show');
 
 
+//--- ΓΙΑ ΦΙΛΤΡΑ
+ populateFilterDropdowns();
+
+    // Προσθέστε event listeners στα dropdowns, ώστε να καλείται η applyFilters() κάθε φορά που αλλάζει η επιλογή
+    document.getElementById('refereeFilter').addEventListener('change', applyFilters);
+    document.getElementById('commissionerFilter').addEventListener('change', applyFilters);
+    document.getElementById('judgeFilter').addEventListener('change', applyFilters);
+
+    // Εφαρμόστε τα φίλτρα στην αρχική φόρτωση (ώστε να εμφανίζονται όλα)
+ applyFilters();
+
+
+
+
+
+
         }   //--- END of function handle_DrawDiorganvseis_DataQueryResponse(response)
 
         //---
@@ -340,6 +356,15 @@
                 curAgvnistikh_orismoi = "";
 
 
+// --- Global Variables (Δηλώστε αυτές στην κορυφή του script σας) ---
+// Αυτά θα αποθηκεύουν τα HTML στοιχεία των αγώνων για εύκολο φιλτράρισμα
+const allMatchDefinitionItems = [];
+// Αυτά θα συλλέγουν τα μοναδικά ονόματα για τα dropdowns
+const uniqueReferees = new Set();
+const uniqueCommissioners = new Set();
+const uniqueJudges = new Set();                
+
+
                 for (let row = 0; row < posesEggrafes; row++) {
                     // metablhth gia to όταν υπάρχει ΡΕΠΟ σε μια ομάδα να μην εμφανίζονται οι διαιτητές - Κριτές κλπα
                     var isRepo=false;
@@ -436,9 +461,14 @@
                         formattedDate = `${day} ${monthAbbr}`;
                     }
 
+                    //--- ΚΕΛΥΦΟΣ ΑΓΩΝΑ
                     let iDivAgvnas = document.createElement('div');
                     iDivAgvnas.id = 'agvnas-prg-div-' + row;
                     iDivAgvnas.className = 'row MatchListItem__wrapper MatchList__match';
+
+
+// Το κύριο div που περιέχει τα στοιχεία του αγώνα (θα φιλτραριστεί)               
+   iDivAgvnas.classList.add('MatchListItem'); // Προσθέστε μια κλάση για να το αναγνωρίσετε εύκολα
 
                     const teamAValue = data.getFormattedValue(row, 6);
                     const teamBValue = data.getFormattedValue(row, 7);
@@ -554,133 +584,158 @@
                     iDivAgvnas.appendChild(matchContentDiv);
 
 
-                // --- Προσθήκη των Στοιχείων Ορισμών (Διαιτητές, Κομισάριος, Κριτές) ---
-                    let orismoiDetailsDiv = document.createElement('div');
-                    orismoiDetailsDiv.classList.add('MatchListItem__orismoi-details');
+    // --- Προσθήκη των Στοιχείων Ορισμών (Διαιτητές, Κομισάριος, Κριτές) ---
+    let orismoiDetailsDiv = document.createElement('div');
+    orismoiDetailsDiv.classList.add('MatchListItem__orismoi-details');
 
-                    // Create a new Bootstrap row to hold the three columns
-                    let orismoiRow = document.createElement('div');
-                    orismoiRow.classList.add('row', 'g-3'); // 'g-3' adds some gutter spacing between columns
-                    if(isRepo){
-                        orismoiRow.classList.add('d-none'); // κρυβει τους ορισμους σε περιπτωση ρεπό
-                    }
+    let orismoiRow = document.createElement('div');
+    orismoiRow.classList.add('row', 'g-3');
+    if(isRepo){
+        orismoiRow.classList.add('d-none'); // κρύβει τους ορισμούς σε περίπτωση ρεπό
+    }
 
-                    // --- α. Διαιτητές (Column 1) ---
-                    let diaititesCol = document.createElement('div');
-                    diaititesCol.classList.add('col-md-4', 'col-sm-12'); // Takes 1/3 width on medium screens, full width on small
-                    
-                    let diaititesDiv = document.createElement('div');
-                    diaititesDiv.classList.add('MatchListItem__section-title');
-                    diaititesDiv.textContent = 'ΔΙΑΤΗΤΕΣ:';
-                    diaititesCol.appendChild(diaititesDiv);
+    // --- α. Διαιτητές (Column 1) ---
+    let diaititesCol = document.createElement('div');
+    diaititesCol.classList.add('col-md-4', 'col-sm-12'); // 1/3 πλάτος σε μεσαίες οθόνες, πλήρες σε μικρές
+    
+    let diaititesDiv = document.createElement('div');
+    diaititesDiv.classList.add('MatchListItem__section-title');
+    diaititesDiv.textContent = 'ΔΙΑΙΤΗΤΕΣ:';
+    diaititesCol.appendChild(diaititesDiv);
 
-                    let diaititesList = document.createElement('ul');
-                    diaititesList.classList.add('MatchListItem__list');
+    let diaititesList = document.createElement('ul');
+    diaititesList.classList.add('MatchListItem__list');
 
-                    const diaititis1 = data.getFormattedValue(row, 10);
-                    const diaititis2 = data.getFormattedValue(row, 11);
-                    const diaititis3 = data.getFormattedValue(row, 12);
+    if (currentReferees.length > 0) {
+        currentReferees.forEach(name => {
+            let li = document.createElement('li');
+            li.textContent = name;
+            diaititesList.appendChild(li);
+        });
+    } else {
+        let li = document.createElement('li');
+        li.innerHTML = " &empty;";
+        diaititesList.appendChild(li);
+    }
+    diaititesCol.appendChild(diaititesList);
+    orismoiRow.appendChild(diaititesCol);
 
-                    if (diaititis1) {
-                        let li1 = document.createElement('li');
-                        li1.textContent = diaititis1;
-                        diaititesList.appendChild(li1);
-                    }
-                    if (diaititis2) {
-                        let li2 = document.createElement('li');
-                        li2.textContent = diaititis2;
-                        diaititesList.appendChild(li2);
-                    }
-                    if (diaititis3) {
-                        let li3 = document.createElement('li');
-                        li3.textContent = diaititis3;
-                        diaititesList.appendChild(li3);
-                    }
-                    if (!diaititis1 && !diaititis2 && !diaititis3) {
-                        let li = document.createElement('li');
-                        //-- li.textContent = "Δεν έχουν οριστεί"΄
-                        li.innerHTML = " &empty;";
-                        diaititesList.appendChild(li);
-                    }
-                    diaititesCol.appendChild(diaititesList); // Append diaititesList to its column
-                    orismoiRow.appendChild(diaititesCol);    // Append diaititesCol to the row
+    // --- β. Κομισάριος (Column 2) ---
+    let komisariosCol = document.createElement('div');
+    komisariosCol.classList.add('col-md-4', 'col-sm-12', 'komisarios-column-to-hide');
 
-                    // --- β. Κομισάριος (Column 2) ---
-                    let komisariosCol = document.createElement('div');
-                    komisariosCol.classList.add('col-md-4', 'col-sm-12', 'komisarios-column-to-hide');
+    let komisariosDiv = document.createElement('div');
+    komisariosDiv.classList.add('MatchListItem__section-title');
+    komisariosDiv.textContent = 'ΚΟΜΙΣΑΡΙΟΣ:';
+    komisariosCol.appendChild(komisariosDiv);
 
-                    let komisariosDiv = document.createElement('div');
-                    komisariosDiv.classList.add('MatchListItem__section-title');
-                    komisariosDiv.textContent = 'ΚΟΜΙΣΑΡΙΟΣ:';
-                    komisariosCol.appendChild(komisariosDiv);
+    if (currentCommissioners.length > 0) {
+        let pKomisarios = document.createElement('p');
+        pKomisarios.classList.add('MatchListItem__single-value');
+        pKomisarios.textContent = currentCommissioners[0]; // Κομισάριος είναι ένας
+        komisariosCol.appendChild(pKomisarios);
+    } else {
+        let pKomisarios = document.createElement('p');
+        pKomisarios.classList.add('MatchListItem__single-value');
+        pKomisarios.innerHTML = "&empty;";
+        komisariosCol.appendChild(pKomisarios);
+        komisariosCol.classList.add('invisible'); // Προσθήκη invisible αν δεν υπάρχει
+    }
+    orismoiRow.appendChild(komisariosCol);
 
-                    let komisariosValue = data.getFormattedValue(row, 55); // Use the correct column for commissioner
-                    if (komisariosValue) {
-                        let pKomisarios = document.createElement('p');
-                        pKomisarios.classList.add('MatchListItem__single-value');
-                        pKomisarios.textContent = komisariosValue;
-                        komisariosCol.appendChild(pKomisarios);
-                    } else {
-                        let pKomisarios = document.createElement('p');
-                        pKomisarios.classList.add('MatchListItem__single-value');
-                        pKomisarios.innerHTML = "&empty;";
-                        //-- pKomisarios.textContent = "Δεν έχει οριστεί";
-                        komisariosCol.appendChild(pKomisarios);
-                        komisariosCol.classList.add('invisible');
-                    }
-                    orismoiRow.appendChild(komisariosCol); // Append komisariosCol to the row
+    // --- γ. Κριτές (Column 3) ---
+    let kritesCol = document.createElement('div');
+    kritesCol.classList.add('col-md-4', 'col-sm-12');
 
-                    // --- γ. Κριτές (Column 3) ---
-                    let kritesCol = document.createElement('div');
-                    kritesCol.classList.add('col-md-4', 'col-sm-12');
+    let kritesDiv = document.createElement('div');
+    kritesDiv.classList.add('MatchListItem__section-title');
+    kritesDiv.textContent = 'ΚΡΙΤΕΣ:';
+    kritesCol.appendChild(kritesDiv);
 
-                    let kritesDiv = document.createElement('div');
-                    kritesDiv.classList.add('MatchListItem__section-title');
-                    kritesDiv.textContent = 'ΚΡΙΤΕΣ:';
-                    kritesCol.appendChild(kritesDiv);
+    let kritesList = document.createElement('ul');
+    kritesList.classList.add('MatchListItem__list');
 
-                    let kritesList = document.createElement('ul');
-                    kritesList.classList.add('MatchListItem__list');
+    if (currentJudges.length > 0) {
+        currentJudges.forEach(name => {
+            let li = document.createElement('li');
+            li.textContent = name;
+            kritesList.appendChild(li);
+        });
+    } else {
+        let li = document.createElement('li');
+        li.innerHTML = "&empty;";
+        kritesList.appendChild(li);
+    }
+    kritesCol.appendChild(kritesList);
+    orismoiRow.appendChild(kritesCol);
 
-                    // Assuming fields 13, 14, 15 for judges. Adjust if needed.
-                    const kritis1 = data.getFormattedValue(row, 13);
-                    const kritis2 = data.getFormattedValue(row, 14);
-                    const kritis3 = data.getFormattedValue(row, 15);
+    orismoiDetailsDiv.appendChild(orismoiRow);
+    iDivAgvnas.appendChild(orismoiDetailsDiv);
 
-                    if (kritis1) {
-                        let liKritis1 = document.createElement('li');
-                        liKritis1.textContent = kritis1;
-                        kritesList.appendChild(liKritis1);
-                    }
-                    if (kritis2) {
-                        let liKritis2 = document.createElement('li');
-                        liKritis2.textContent = kritis2;
-                        kritesList.appendChild(liKritis2);
-                    }
-                    if (kritis3) {
-                        let liKritis3 = document.createElement('li');
-                        liKritis3.textContent = kritis3;
-                        kritesList.appendChild(liKritis3);
-                    }
-                    if (!kritis1 && !kritis2 && !kritis3) {
-                        let li = document.createElement('li');
-                        // li.textContent = "Δεν έχουν οριστεί";
-                        li.innerHTML = "&empty;";
-
-                        kritesList.appendChild(li);
-                    }
-                    kritesCol.appendChild(kritesList); // Append kritesList to its column
-                    orismoiRow.appendChild(kritesCol);   // Append kritesCol to the row
-
-                    // Append the new row containing the three columns to orismoiDetailsDiv
-                    orismoiDetailsDiv.appendChild(orismoiRow);
-
-                    // Προσθήκη του νέου div ορισμών κάτω από το matchContentDiv
-                    iDivAgvnas.appendChild(orismoiDetailsDiv);
+// Προσθέτουμε το δημιουργημένο στοιχείο στον global πίνακα για φιλτράρισμα
+allMatchDefinitionItems.push(iDivAgvnas);
 
 
                 }
         }
+
+/**
+ * Συμπληρώνει τα dropdown φίλτρα με μοναδικά ονόματα.
+ */
+function populateFilterDropdowns() {
+    const refereeSelect = document.getElementById('refereeFilter');
+    const commissionerSelect = document.getElementById('commissionerFilter');
+    const judgeSelect = document.getElementById('judgeFilter');
+
+    // Βοηθητική συνάρτηση για συμπλήρωση ενός dropdown
+    const populateSelect = (selectElement, namesSet) => {
+        // Καθαρίζουμε τις προηγούμενες επιλογές (εκτός από το "Όλα")
+        selectElement.innerHTML = '<option value="Όλα">Όλα</option>';
+        // Ταξινομούμε τα ονόματα αλφαβητικά πριν τα προσθέσουμε
+        const sortedNames = Array.from(namesSet).sort((a, b) => a.localeCompare(b, 'el', { sensitivity: 'base' }));
+        sortedNames.forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            selectElement.appendChild(option);
+        });
+    };
+
+    populateSelect(refereeSelect, uniqueReferees);
+    populateSelect(commissionerSelect, uniqueCommissioners);
+    populateSelect(judgeSelect, uniqueJudges);
+}
+
+/**
+ * Εφαρμόζει τα επιλεγμένα φίλτρα στα στοιχεία των αγώνων.
+ */
+function applyFilters() {
+    const selectedReferee = document.getElementById('refereeFilter').value;
+    const selectedCommissioner = document.getElementById('commissionerFilter').value;
+    const selectedJudge = document.getElementById('judgeFilter').value;
+
+    allMatchDefinitionItems.forEach(matchItem => {
+        // Διαβάζουμε τα data attributes. Χρησιμοποιούμε split(',') για να τα κάνουμε πάλι πίνακες.
+        // Το filter(Boolean) αφαιρεί τυχόν κενά strings αν το data attribute ήταν άδειο.
+        const referees = matchItem.dataset.referees ? matchItem.dataset.referees.split(',').filter(Boolean) : [];
+        const commissioner = matchItem.dataset.commissioner || '';
+        const judges = matchItem.dataset.judges ? matchItem.dataset.judges.split(',').filter(Boolean) : [];
+
+        // Έλεγχος για κάθε φίλτρο:
+        // Αν η επιλογή είναι "Όλα", τότε το φίλτρο ταιριάζει πάντα.
+        // Αλλιώς, ελέγχουμε αν το όνομα περιέχεται στον αντίστοιχο πίνακα (για διαιτητές/κριτές)
+        // ή αν ταιριάζει ακριβώς (για κομισάριο).
+        const refereeMatch = (selectedReferee === 'Όλα') || referees.includes(selectedReferee);
+        const commissionerMatch = (selectedCommissioner === 'Όλα') || commissioner === selectedCommissioner;
+        const judgeMatch = (selectedJudge === 'Όλα') || judges.includes(selectedJudge);
+
+        // Ένας αγώνας εμφανίζεται μόνο αν ΟΛΑ τα φίλτρα ταιριάζουν (λογική AND)
+        const shouldShow = refereeMatch && commissionerMatch && judgeMatch;
+
+        matchItem.style.display = shouldShow ? '' : 'none'; // Εμφάνιση ή απόκρυψη
+    });
+}
+
 
     </script>
 
