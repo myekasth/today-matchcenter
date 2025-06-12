@@ -183,7 +183,6 @@
                     if (matchStartDateTime && !isNaN(matchStartDateTime.getTime())) { // Βεβαιωθείτε ότι η ημερομηνία είναι έγκυρη
                         const now = new Date(); // Η τρέχουσα ώρα
                         const twoHoursAfterStart = new Date(matchStartDateTime.getTime() + (2 * 60 * 60 * 1000)); // Ώρα έναρξης + 2 ώρες
-                        console.log('twoHoursAfterStart : ' + twoHoursAfterStart);
 
                         // Ελέγχουμε αν η τρέχουσα ώρα είναι ΜΕΤΑ την ώρα έναρξης
                         // ΚΑΙ η τρέχουσα ώρα είναι ΠΡΙΝ από 2 ώρες μετά την ώρα έναρξης
@@ -722,7 +721,7 @@
             font-weight: bold; /* Προαιρετικά, για να τονιστεί περισσότερο */
 
             /* Animation Properties */
-            animation: gentle-blink 2s infinite alternate; /* Ορισμός animation */
+            animation: gentle-blink 1.5s infinite alternate; /* Ορισμός animation */
         }
 
         /* Keyframes για το animation */
@@ -731,7 +730,7 @@
                 opacity: 1; /* Πλήρης αδιαφάνεια στην αρχή */
             }
             100% {
-                opacity: 0.7; /* Ελαφρώς πιο αχνό στο τέλος */
+                opacity: 0.4; /* Ελαφρώς πιο αχνό στο τέλος */
             }
         }
 
