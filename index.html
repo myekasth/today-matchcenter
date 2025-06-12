@@ -720,6 +720,19 @@
         .MatchListItem__time.highlight-time {
             color: red;
             font-weight: bold; /* Προαιρετικά, για να τονιστεί περισσότερο */
+
+            /* Animation Properties */
+            animation: gentle-blink 2s infinite alternate; /* Ορισμός animation */
+        }
+
+        /* Keyframes για το animation */
+        @keyframes gentle-blink {
+            0% {
+                opacity: 1; /* Πλήρης αδιαφάνεια στην αρχή */
+            }
+            100% {
+                opacity: 0.7; /* Ελαφρώς πιο αχνό στο τέλος */
+            }
         }
 
         /* --- ΓΗΠΕΔΟ -- */
