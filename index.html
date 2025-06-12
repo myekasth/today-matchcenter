@@ -677,6 +677,8 @@
 
                     // Προσθήκη του νέου div ορισμών κάτω από το matchContentDiv
                     iDivAgvnas.appendChild(orismoiDetailsDiv);
+
+
                 }
         }
 
@@ -946,6 +948,35 @@
                         </div>
                     </div>
                     <div class="tab-pane fade show active" id="pills-orismoi" role="tabpanel" aria-labelledby="pills-orismoi-tab" tabindex="0">
+
+                        <!-- ΝΕΟ: Πεδία Φίλτρων -->
+                        <div class="filter-section p-3 bg-light rounded mb-3">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="refereeFilter" class="form-label">Διαιτητές:</label>
+                                    <select class="form-select" id="refereeFilter">
+                                        <option value="Όλα">Όλα</option>
+                                        <!-- Options θα συμπληρωθούν από JS -->
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="commissionerFilter" class="form-label">Κομισάριος:</label>
+                                    <select class="form-select" id="commissionerFilter">
+                                        <option value="Όλα">Όλα</option>
+                                        <!-- Options θα συμπληρωθούν από JS -->
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="judgeFilter" class="form-label">Κριτές:</label>
+                                    <select class="form-select" id="judgeFilter">
+                                        <option value="Όλα">Όλα</option>
+                                        <!-- Options θα συμπληρωθούν από JS -->
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- ΤΕΛΟΣ ΝΕΩΝ ΠΕΔΙΩΝ ΦΙΛΤΡΩΝ -->
+
                         <div class="container text-center" id="pills-orismoi-container-id">
                         </div>
                     </div>
