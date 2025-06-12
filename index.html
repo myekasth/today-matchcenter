@@ -367,10 +367,66 @@
                         parentElement.appendChild(iDivAgvnistikh);
                     }
 
-                    // --- Αγώνας ---
+                   // --- Αγώνας ---
+                    //--- για την ΗΜΕΡΟΜΗΝΙΑ ή την ένδειξη κατάστασης του αγώνα
+                    // ΣΕΝΑΡΙΟ : Το data.getValue(row, 3) φέρνει μόνο Ημερομηνία και ο Χρόνος είναι σε άλλο πεδίο (π.χ. data.getValue(row, 4))
+                    
+                        const matchDateString = data.getValue(row, 3); // π.χ. "13/06/2025"
+                        const matchTimeString = data.getValue(row, 4); // π.χ. "18.00"
+
+                        let matchStartDateTime;
+
+                        // Πρώτα μετατρέπουμε τη συμβολοσειρά ημερομηνίας "DD/MM/YYYY" σε "YYYY-MM-DD"
+                        if (typeof matchDateString === 'string' && matchDateString.includes('/')) {
+                            const parts = matchDateString.split('/'); // Διαχωρίζουμε την ημερομηνία: ["13", "06", "2025"]
+                            // Ελέγχουμε αν έχουμε 3 μέρη για να αποφύγουμε σφάλματα
+                            if (parts.length === 3) {
+                                // Αναδιατάσσουμε σε "YYYY-MM-DD"
+                                const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+
+                                // Μετατρέπουμε την ώρα "hh.mm" σε "hh:mm"
+                                const formattedTime = matchTimeString.replace('.', ':');
+
+                                // Δημιουργούμε το τελικό Date αντικείμενο
+                                matchStartDateTime = new Date(`${formattedDate}T${formattedTime}:00`);
+                            } else {
+                                console.warn(`Unexpected date format: ${matchDateString}`);
+                                matchStartDateTime = null; // Mark as invalid
+                            }
+                        } else {
+                            // Αν δεν είναι string ή δεν περιέχει '/', προσπαθούμε να το χειριστούμε ως Date object απευθείας
+                            // ή ως άλλη μορφή συμβολοσειράς που μπορεί να είναι έγκυρη
+                            try {
+                                matchStartDateTime = new Date(matchDateString);
+                                if (matchTimeString) { // Αν υπάρχει και ώρα, προσθέτουμε την ώρα
+                                const [hours, minutes] = matchTimeString.replace('.', ':').split(':').map(Number);
+                                matchStartDateTime.setHours(hours, minutes, 0, 0);
+                                }
+                            } catch (e) {
+                                console.error(`Error parsing date: ${matchDateString}`, e);
+                                matchStartDateTime = null;
+                            }
+                        }
+                    //--- END ΣΕΝΑΡΙΟ METATROPHS και συνθεσης DateTime
+
+                    // --- ΕΛΕΓΧΟΣ ΓΙΑ ΚΟΚΚΙΝΗ ΩΡΑ ---
+                    let timeClass = 'MatchListItem__time'; // Η default κλάση
+                    if (matchStartDateTime && !isNaN(matchStartDateTime.getTime())) { // Βεβαιωθείτε ότι η ημερομηνία είναι έγκυρη
+                        const now = new Date(); // Η τρέχουσα ώρα
+                        const twoHoursAfterStart = new Date(matchStartDateTime.getTime() + (2 * 60 * 60 * 1000)); // Ώρα έναρξης + 2 ώρες
+
+                        // Ελέγχουμε αν η τρέχουσα ώρα είναι ΜΕΤΑ την ώρα έναρξης
+                        // ΚΑΙ η τρέχουσα ώρα είναι ΠΡΙΝ από 2 ώρες μετά την ώρα έναρξης
+                        if (now >= matchStartDateTime && now < twoHoursAfterStart) {
+                            timeClass += ' highlight-time'; // Προσθέτουμε την κλάση για κόκκινο χρώμα
+                            //-- *** την timeClass θα την χρησιμοποιήσουμε παρακάτω στο σημείο όπου αποτυπώνεται ο χρόνος
+                        }
+                    }                    
+
+
                     const dateObject = data.getValue(row, 3);
                     let formattedDate = "N/A";
-                    if (dateObject instanceof Date && !isNaN(dateObject.getTime())) {
+                    if (dateObject instanceof Date && !isNaN(dateObject.getTime())) { // Ensure it's a valid Date object
                         const greekMonthsAbbr = [
                             "ΙΑΝ", "ΦΕΒ", "ΜΑΡ", "ΑΠΡ", "ΜΑΪ", "ΙΟΥΝ",
                             "ΙΟΥΛ", "ΑΥΓ", "ΣΕΠ", "ΟΚΤ", "ΝΟΕ", "ΔΕΚ"
@@ -379,7 +435,6 @@
                         const monthAbbr = greekMonthsAbbr[dateObject.getMonth()];
                         formattedDate = `${day} ${monthAbbr}`;
                     }
-    
 
                     let iDivAgvnas = document.createElement('div');
                     iDivAgvnas.id = 'agvnas-prg-div-' + row;
@@ -389,6 +444,7 @@
                     const teamBValue = data.getFormattedValue(row, 7);
                     const statusValue = data.getFormattedValue(row, 2);
 
+                    //--- για την ΩΡΑ ή την ένδειξη κατάστασης του αγώνα
                     if (teamAValue === "-" || teamBValue === "-") {
                         iDivAgvnas.innerHTML = '<div class="col MatchListItem__header"><span class="MatchListItem__date">' + formattedDate + '</span> <span class="MatchListItem__time">Ρ Ε Π Ο </span></div>';
                         isRepo=true
@@ -397,7 +453,7 @@
                     } else if (statusValue === "ΑΑ") {
                         iDivAgvnas.innerHTML = '<div class="col MatchListItem__header"><span class="MatchListItem__date"> ΑΑ </span> </div>';
                     } else {
-                        iDivAgvnas.innerHTML = '<div class="col MatchListItem__header"><span class="MatchListItem__date">' + formattedDate + '</span> <span class="MatchListItem__time"> ' + data.getFormattedValue(row, 4) + '</span></div>';
+                        iDivAgvnas.innerHTML = '<div class="col MatchListItem__header"><span class="MatchListItem__date">' + formattedDate + '</span> <span class="'+ timeClass +'"> ' + data.getFormattedValue(row, 4) + '</span></div>';
                     }
                     parentElement.appendChild(iDivAgvnas);
 
@@ -721,7 +777,7 @@
             font-weight: bold; /* Προαιρετικά, για να τονιστεί περισσότερο */
 
             /* Animation Properties */
-            animation: gentle-blink 1s infinite alternate; /* Ορισμός animation */
+            animation: gentle-blink 1.2s infinite alternate; /* Ορισμός animation */
         }
 
         /* Keyframes για το animation */
