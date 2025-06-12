@@ -149,6 +149,7 @@
                         // Αν το matchTimeString είναι "hh.mm", αντικαθιστούμε την τελεία με άνω κάτω τελεία για σωστή parsing
                         const formattedTimeString = matchTimeString.replace('.', ':');
                         matchStartDateTime = new Date(`${matchDateString}T${formattedTimeString}:00`); // Δημιουργούμε ISO 8601 συμβολοσειρά
+                        console.log(matchStartDateTime);
                     } catch (e) {
                         console.error("Σφάλμα στη μετατροπή ημερομηνίας/ώρας:", e, "Δεδομένα:", matchDateString, matchTimeString);
                         // Χειριστείτε το σφάλμα, π.χ., μην εφαρμόζετε κόκκινο χρώμα
@@ -161,6 +162,7 @@
                     if (matchStartDateTime && !isNaN(matchStartDateTime.getTime())) { // Βεβαιωθείτε ότι η ημερομηνία είναι έγκυρη
                         const now = new Date(); // Η τρέχουσα ώρα
                         const twoHoursAfterStart = new Date(matchStartDateTime.getTime() + (2 * 60 * 60 * 1000)); // Ώρα έναρξης + 2 ώρες
+                        console.log('twoHoursAfterStart : ' + twoHoursAfterStart);
 
                         // Ελέγχουμε αν η τρέχουσα ώρα είναι ΜΕΤΑ την ώρα έναρξης
                         // ΚΑΙ η τρέχουσα ώρα είναι ΠΡΙΝ από 2 ώρες μετά την ώρα έναρξης
