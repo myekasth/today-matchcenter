@@ -140,21 +140,42 @@
                     //--- για την ΗΜΕΡΟΜΗΝΙΑ ή την ένδειξη κατάστασης του αγώνα
                     // ΣΕΝΑΡΙΟ : Το data.getValue(row, 3) φέρνει μόνο Ημερομηνία και ο Χρόνος είναι σε άλλο πεδίο (π.χ. data.getValue(row, 4))
                     
-                    const matchDateString = data.getValue(row, 3); // π.χ. "2025-06-11"
-                    const matchTimeString = data.getValue(row, 4); // π.χ. "18.00" ή "18:00"
+                        const matchDateString = data.getValue(row, 3); // π.χ. "13/06/2025"
+                        const matchTimeString = data.getValue(row, 4); // π.χ. "18.00"
 
-                    // Ενοποίηση Ημερομηνίας και Ώρας σε ένα ενιαίο Date αντικείμενο
-                    let matchStartDateTime;
-                    try {
-                        // Αν το matchTimeString είναι "hh.mm", αντικαθιστούμε την τελεία με άνω κάτω τελεία για σωστή parsing
-                        const formattedTimeString = matchTimeString.replace('.', ':');
-                        matchStartDateTime = new Date(`${matchDateString}T${formattedTimeString}:00`); // Δημιουργούμε ISO 8601 συμβολοσειρά
-                        console.log(matchStartDateTime);
-                    } catch (e) {
-                        console.error("Σφάλμα στη μετατροπή ημερομηνίας/ώρας:", e, "Δεδομένα:", matchDateString, matchTimeString);
-                        // Χειριστείτε το σφάλμα, π.χ., μην εφαρμόζετε κόκκινο χρώμα
-                        matchStartDateTime = null; // Θέτουμε null για να μην γίνει highlight
-                    }
+                        let matchStartDateTime;
+
+                        // Πρώτα μετατρέπουμε τη συμβολοσειρά ημερομηνίας "DD/MM/YYYY" σε "YYYY-MM-DD"
+                        if (typeof matchDateString === 'string' && matchDateString.includes('/')) {
+                            const parts = matchDateString.split('/'); // Διαχωρίζουμε την ημερομηνία: ["13", "06", "2025"]
+                            // Ελέγχουμε αν έχουμε 3 μέρη για να αποφύγουμε σφάλματα
+                            if (parts.length === 3) {
+                                // Αναδιατάσσουμε σε "YYYY-MM-DD"
+                                const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+
+                                // Μετατρέπουμε την ώρα "hh.mm" σε "hh:mm"
+                                const formattedTime = matchTimeString.replace('.', ':');
+
+                                // Δημιουργούμε το τελικό Date αντικείμενο
+                                matchStartDateTime = new Date(`${formattedDate}T${formattedTime}:00`);
+                            } else {
+                                console.warn(`Unexpected date format: ${matchDateString}`);
+                                matchStartDateTime = null; // Mark as invalid
+                            }
+                        } else {
+                            // Αν δεν είναι string ή δεν περιέχει '/', προσπαθούμε να το χειριστούμε ως Date object απευθείας
+                            // ή ως άλλη μορφή συμβολοσειράς που μπορεί να είναι έγκυρη
+                            try {
+                                matchStartDateTime = new Date(matchDateString);
+                                if (matchTimeString) { // Αν υπάρχει και ώρα, προσθέτουμε την ώρα
+                                const [hours, minutes] = matchTimeString.replace('.', ':').split(':').map(Number);
+                                matchStartDateTime.setHours(hours, minutes, 0, 0);
+                                }
+                            } catch (e) {
+                                console.error(`Error parsing date: ${matchDateString}`, e);
+                                matchStartDateTime = null;
+                            }
+                        }
                     //--- END ΣΕΝΑΡΙΟ METATROPHS και συνθεσης DateTime
 
                     // --- ΕΛΕΓΧΟΣ ΓΙΑ ΚΟΚΚΙΝΗ ΩΡΑ ---
