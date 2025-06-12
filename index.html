@@ -137,6 +137,40 @@
                     }
 
                     // --- Αγώνας ---
+                    //--- για την ΗΜΕΡΟΜΗΝΙΑ ή την ένδειξη κατάστασης του αγώνα
+                    // ΣΕΝΑΡΙΟ : Το data.getValue(row, 3) φέρνει μόνο Ημερομηνία και ο Χρόνος είναι σε άλλο πεδίο (π.χ. data.getValue(row, 4))
+                    
+                    const matchDateString = data.getValue(row, 3); // π.χ. "2025-06-11"
+                    const matchTimeString = data.getValue(row, 4); // π.χ. "18.00" ή "18:00"
+
+                    // Ενοποίηση Ημερομηνίας και Ώρας σε ένα ενιαίο Date αντικείμενο
+                    let matchStartDateTime;
+                    try {
+                        // Αν το matchTimeString είναι "hh.mm", αντικαθιστούμε την τελεία με άνω κάτω τελεία για σωστή parsing
+                        const formattedTimeString = matchTimeString.replace('.', ':');
+                        matchStartDateTime = new Date(`${matchDateString}T${formattedTimeString}:00`); // Δημιουργούμε ISO 8601 συμβολοσειρά
+                    } catch (e) {
+                        console.error("Σφάλμα στη μετατροπή ημερομηνίας/ώρας:", e, "Δεδομένα:", matchDateString, matchTimeString);
+                        // Χειριστείτε το σφάλμα, π.χ., μην εφαρμόζετε κόκκινο χρώμα
+                        matchStartDateTime = null; // Θέτουμε null για να μην γίνει highlight
+                    }
+                    //--- END ΣΕΝΑΡΙΟ METATROPHS και συνθεσης DateTime
+
+                    // --- ΕΛΕΓΧΟΣ ΓΙΑ ΚΟΚΚΙΝΗ ΩΡΑ ---
+                    let timeClass = 'MatchListItem__time'; // Η default κλάση
+                    if (matchStartDateTime && !isNaN(matchStartDateTime.getTime())) { // Βεβαιωθείτε ότι η ημερομηνία είναι έγκυρη
+                        const now = new Date(); // Η τρέχουσα ώρα
+                        const twoHoursAfterStart = new Date(matchStartDateTime.getTime() + (2 * 60 * 60 * 1000)); // Ώρα έναρξης + 2 ώρες
+
+                        // Ελέγχουμε αν η τρέχουσα ώρα είναι ΜΕΤΑ την ώρα έναρξης
+                        // ΚΑΙ η τρέχουσα ώρα είναι ΠΡΙΝ από 2 ώρες μετά την ώρα έναρξης
+                        if (now >= matchStartDateTime && now < twoHoursAfterStart) {
+                            timeClass += ' highlight-time'; // Προσθέτουμε την κλάση για κόκκινο χρώμα
+                            //-- *** την timeClass θα την χρησιμοποιήσουμε παρακάτω στο σημείο όπου αποτυπώνεται ο χρόνος
+                        }
+                    }                    
+
+
                     const dateObject = data.getValue(row, 3);
                     let formattedDate = "N/A";
                     if (dateObject instanceof Date && !isNaN(dateObject.getTime())) { // Ensure it's a valid Date object
@@ -157,6 +191,7 @@
                     const teamBValue = data.getFormattedValue(row, 7);
                     const statusValue = data.getFormattedValue(row, 2);
 
+                    //--- για την ΩΡΑ ή την ένδειξη κατάστασης του αγώνα
                     if (teamAValue === "-" || teamBValue === "-") {
                         iDivAgvnas.innerHTML = '<div class="col MatchListItem__header"><span class="MatchListItem__date">' + formattedDate + '</span> <span class="MatchListItem__time">Ρ Ε Π Ο </span></div>';
                         isRepo=true
@@ -165,9 +200,10 @@
                     } else if (statusValue === "ΑΑ") {
                         iDivAgvnas.innerHTML = '<div class="col MatchListItem__header"><span class="MatchListItem__date"> ΑΑ </span> </div>';
                     } else {
-                        iDivAgvnas.innerHTML = '<div class="col MatchListItem__header"><span class="MatchListItem__date">' + formattedDate + '</span> <span class="MatchListItem__time"> ' + data.getFormattedValue(row, 4) + '</span></div>';
+                        iDivAgvnas.innerHTML = '<div class="col MatchListItem__header"><span class="MatchListItem__date">' + formattedDate + '</span> <span class="'+ timeClass +'"> ' + data.getFormattedValue(row, 4) + '</span></div>';
                     }
                     parentElement.appendChild(iDivAgvnas);
+
 
                  // --- λογοτυπα Ομάδες και Σκορ Αγώνα ---
                     let matchContentDiv = document.createElement('div');
@@ -639,6 +675,8 @@
             border-right: 1px solid #e2e4e6;
         }
 
+        /* --- ΗΜΕΡΟΜΗΝΙΑ ΧΡΟΝΟΣ -- */
+
         .MatchListItem__date {
             color: #003e5e;
             font-size: 12px;
@@ -654,6 +692,11 @@
             font-weight: bold;
             text-align: center;
             line-height: 0.8;
+        }
+
+        .MatchListItem__time.highlight-time {
+            color: red;
+            font-weight: bold; /* Προαιρετικά, για να τονιστεί περισσότερο */
         }
 
         /* --- ΓΗΠΕΔΟ -- */
