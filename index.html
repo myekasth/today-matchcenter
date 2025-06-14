@@ -557,6 +557,29 @@
                     // Προσθέτουμε το δημιουργημένο στοιχείο στον global πίνακα για φιλτράρισμα
                     allMatchDefinitionItems.push(iDivAgvnas);
                 }
+
+            // ΝΕΟ ΚΩΔΙΚΑΣ ΕΔΩ: Προσθήκη της ένδειξης στο τέλος
+            const ekasthDiv = document.createElement('div');
+            ekasthDiv.classList.add('ekasth-footer-text', 'text-center', 'mt-3', 'mb-3'); // Προσθέτουμε κλάσεις για στυλ και κεντράρισμα
+
+            // Δημιουργία της τρέχουσας ημερομηνίας και ώρας
+            const now = new Date();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const year = now.getFullYear();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+
+            const formattedDateTime = `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
+
+            ekasthDiv.textContent = `Ε.ΚΑ.Σ.Θ. 1976 - ${formattedDateTime}`;
+
+            parentElement.appendChild(ekasthDiv);
+            //*** END ΝΕΟ ΚΩΔΙΚΑΣ ΕΔΩ: Προσθήκη της ένδειξης στο τέλος
+
+
+
         }
 
         /**
@@ -1149,13 +1172,22 @@
             }
         /**** END TA FILTER είναι πέντε εδώ τα δύο κάτω Γήπεδο και ομάδες θα grouparistoyn kai θα κεντραριστούν*/
 
+        /* ... ΤΟ ΚΕΙΜΕΝΟ ενδειξη κάτω κάτω μετά τους αγώνες για το πότε τυπώθηκε */
 
+            .ekasth-footer-text {
+                font-size: 0.75em; /* Μικρή γραμματοσειρά */
+                color: #888;      /* Γκρι χρώμα */
+                margin-top: 15px; /* Μικρή απόσταση από τον τελευταίο αγώνα */
+                /* Το text-center και τα margins θα προστεθούν με τις Bootstrap κλάσεις 'text-center', 'mt-3', 'mb-3' */
+            }
 
-        /*/**** Style for the Export PDF button */
+        /**** ΤΟ ΚΕΙΜΕΝΟ ενδειξη κάτω κάτω μετά τους αγώνες για το πότε τυπώθηκε */
+
+        /***** Style for the Export PDF button */
         .btn-pdf-export { /* Νέα κλάση για τα κουμπιά PDF για ομοιόμορφο στυλ */
             margin: 20px auto 0 auto; /* Centering and spacing, 0 margin-top for flex container */
-            padding: 10px 20px;
-            font-size: 1.1em;
+            padding: 6px 12px;
+            font-size: 0.9em;
             color: white;
             border: none;
             border-radius: 5px;
@@ -1170,8 +1202,6 @@
         #exportPdfButtonHtml:hover {
             background-color: #0056b3;
         }
-
-
         /* END Style for the Export PDF button */
 
         /* Κρύψτε το Komisarios column σε οθόνες μικρότερες από το μέσο breakpoint (π.χ. 768px) */
