@@ -20,8 +20,8 @@
     <!-- link href="https://fonts.googleapis.com/css2?family=Mansalva&display=swap" rel="stylesheet" /  -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet" />
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous" />
-    <link href="https://use.fontawesome.com/releases/v5.1.1/css/all.css" rel="stylesheet" integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ" crossorigin="anonymous" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous" />
+    <link href="https://use.fontawesome.com/releases/v5.1.1/css/all.css" rel="stylesheet" xintegrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ" crossorigin="anonymous" />
 
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
@@ -84,8 +84,10 @@
             const orismoiContainer = document.getElementById('pills-orismoi-container-id');
             const toggleOrismoiDetails = document.getElementById('toggleOrismoiDetails'); // Αναφορά στο διακόπτη
             const loadingSpinner = document.getElementById('loadingSpinner'); // Αναφορά στο loading spinner
-            // ΝΕΟ: Αναφορά στο κουμπί export PDF
-            const exportPdfButton = document.getElementById('exportPdfButton');
+            // ΝΕΟ: Αναφορά στα κουμπιά export PDF
+            const exportPdfButtonHtml = document.getElementById('exportPdfButtonHtml');
+            const exportPdfButtonData = document.getElementById('exportPdfButtonData');
+
 
             // 1. Εμφάνιση loading spinner στην αρχή
             if (loadingSpinner) {
@@ -95,9 +97,12 @@
             if (orismoiContainer) {
                 orismoiContainer.style.display = 'none';
             }
-            // ΝΕΟ: Απόκρυψη κουμπιού PDF μέχρι να φορτώσουν
-            if (exportPdfButton) {
-                exportPdfButton.style.display = 'none';
+            // ΝΕΟ: Απόκρυψη κουμπιών PDF μέχρι να φορτώσουν
+            if (exportPdfButtonHtml) {
+                exportPdfButtonHtml.style.display = 'none';
+            }
+            if (exportPdfButtonData) {
+                exportPdfButtonData.style.display = 'none';
             }
 
             //------ ΚΕΝΤΡΙΚΟΣ ΣΗΜΕΙΟ ΔΙΑΒΑΖΕΙ DATA
@@ -119,8 +124,6 @@
             document.getElementById('pills-orismoi').classList.add('active');
             document.getElementById('pills-orismoi').classList.add('show');
             renderOrismoi('pills-orismoi-container-id');
-            //--- document.getElementById('pills-orismoi').classList.remove('active');
-            //--- document.getElementById('pills-orismoi').classList.remove('show');
 
 
             // Συμπληρώστε τα dropdowns αφού έχουν δημιουργηθεί όλα τα στοιχεία των αγώνων
@@ -135,9 +138,7 @@
             document.getElementById('teamFilter').addEventListener('change', handleExclusiveFilterChange);     // ΝΕΟ: Listener για ομάδα
             // Προσθέστε event listener στον διακόπτη ορατότητας
             toggleOrismoiDetails.addEventListener('change',handleExclusiveFilterChange);
-            document.getElementById('exportPdfButton').addEventListener('click', exportMatchesToPdf);
-
-
+            
             // Εφαρμόστε τα φίλτρα στην αρχική φόρτωση (ώστε να εμφανίζονται όλα)
             applyFilters();
 
@@ -149,9 +150,12 @@
                 if (orismoiContainer) {
                     orismoiContainer.style.display = 'block'; // Or '' if it's default is block/flex/grid
                 }
-                // ΝΕΟ: Εμφάνιση κουμπιού PDF μετά την φόρτωση
-                if (exportPdfButton) {
-                    exportPdfButton.style.display = 'block';
+                // ΝΕΟ: Εμφάνιση κουμπιών PDF μετά την φόρτωση
+                if (exportPdfButtonHtml) {
+                    exportPdfButtonHtml.style.display = 'block';
+                }
+                if (exportPdfButtonData) {
+                    exportPdfButtonData.style.display = 'block';
                 }                
 
         }   //--- END of function handle_DrawDiorganvseis_DataQueryResponse(response)
@@ -293,7 +297,7 @@
                     const kritis1 = data.getFormattedValue(row, 13);
                     const kritis2 = data.getFormattedValue(row, 14);
                     const kritis3 = data.getFormattedValue(row, 15);
-                    const ghpedoValue = data.getFormattedValue(row, 5); // ΝΕΟ: Τιμή γηπέδου
+                    const ghpedoValue = data.getFormattedValue(row, 5); // ΝΕΟ: Τιμή γήπεδου
                     
 
                     // Φιλτράρουμε τα κενά/null/undefined ονόματα για να μην τα συμπεριλάβουμε
@@ -457,7 +461,7 @@
                     
                     let diaititesDiv = document.createElement('div');
                     diaititesDiv.classList.add('MatchListItem__section-title');
-                    diaititesDiv.textContent = 'ΔΙΑΤΗΤΕΣ:';
+                    diaititesDiv.textContent = 'ΔΙΑΙΤΗΤΕΣ:';
                     diaititesCol.appendChild(diaititesDiv);
 
                     let diaititesList = document.createElement('ul');
@@ -733,16 +737,18 @@
             // Τώρα εφαρμόζουμε τα φίλτρα με τη νέα κατάσταση
             applyFilters();
         }        
-       // ΝΕΑ ΛΕΙΤΟΥΡΓΙΑ: Εξαγωγή PDF
-        async function exportMatchesToPdf() {
-            // Κρύβουμε προσωρινά στοιχεία που δεν θέλουμε να εμφανιστούν στο PDF, όπως τα φίλτρα
+        // Λειτουργία: Εξαγωγή PDF από HTML (υπάρχουσα)
+        async function exportMatchesToPdfHtml() {
+            // Κρύβουμε προσωρινά στοιχεία που δεν θέλουμε να εμφανιστούν στο PDF
             const filterSection = document.querySelector('.filter-section');
             const toggleSwitch = document.querySelector('.custom-toggle-container');
-            const exportButton = document.getElementById('exportPdfButton');
+            const exportPdfButtonHtml = document.getElementById('exportPdfButtonHtml');
+            const exportPdfButtonData = document.getElementById('exportPdfButtonData');
 
             if (filterSection) filterSection.style.display = 'none';
             if (toggleSwitch) toggleSwitch.style.display = 'none';
-            if (exportButton) exportButton.style.display = 'none';
+            if (exportPdfButtonHtml) exportPdfButtonHtml.style.display = 'none';
+            if (exportPdfButtonData) exportPdfButtonData.style.display = 'none';
 
 
             const element = document.getElementById('pills-orismoi-container-id'); // Το div που περιέχει τους αγώνες
@@ -751,14 +757,10 @@
                 return;
             }
 
-            // --- ΑΦΑΙΡΕΣΗ: Αυτή η γραμμή προκάλεσε το πρόβλημα (α) ---
-            // const oldHtml = element.innerHTML;
-            // element.innerHTML = '<div class="text-center my-5"><div class="spinner-border text-info" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Δημιουργία PDF... Παρακαλώ περιμένετε...</p></div>';
-
             try {
                 const canvas = await html2canvas(element, {
                     scale: 2, // Αυξήστε την ανάλυση για καλύτερη ποιότητα PDF
-                    useCORS: true // Εάν υπάρχουν εικόνες από διαφορετικό domain (π.χ. λογότυπα ομάδων)
+                    useCORS: true // Εάν υπάρχουν εικόνες από διαφορετικό domain
                 });
 
                 const imgData = canvas.toDataURL('image/png');
@@ -779,21 +781,141 @@
                     doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
                     heightLeft -= pageHeight;
                 }
-                doc.save('Αγώνες_Ορισμοί.pdf');
+                doc.save('Αγώνες_Ορισμοί_HTML.pdf');
             } catch (error) {
-                console.error("Σφάλμα κατά τη δημιουργία PDF:", error);
-                alert("Προέκυψε σφάλμα κατά τη δημιουργία του PDF. Ελέγξτε την κονσόλα για λεπτομέρειες.");
+                console.error("Σφάλμα κατά τη δημιουργία PDF (HTML):", error);
+                alert("Προέκυψε σφάλμα κατά τη δημιουργία του PDF (HTML). Ελέγξτε την κονσόλα για λεπτομέρειες.");
             } finally {
-                // --- ΑΦΑΙΡΕΣΗ: Δεν χρειάζεται πλέον η επαναφορά του innerHTML ---
-                // element.innerHTML = oldHtml;
+                // Επαναφέρουμε τα κρυφά στοιχεία
                 if (filterSection) filterSection.style.display = '';
                 if (toggleSwitch) toggleSwitch.style.display = '';
-                if (exportButton) exportButton.style.display = 'block'; // Εμφάνιση του κουμπιού
-
-                // --- ΠΡΟΣΘΗΚΗ: Καλώντας το applyFilters() για να επαναφέρουμε την κατάσταση των φίλτρων (πρόβλημα β) ---
-                applyFilters();
+                if (exportPdfButtonHtml) exportPdfButtonHtml.style.display = 'block';
+                if (exportPdfButtonData) exportPdfButtonData.style.display = 'block';
+                applyFilters(); // Επαναφορά κατάστασης φίλτρων
             }
         }
+
+        // ΝΕΑ Λειτουργία: Εξαγωγή PDF από Δεδομένα
+        async function exportMatchesToPdfData() {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const margin = 10; // Περιθώριο σε mm
+            let yOffset = margin;
+
+            // Στοιχεία κεφαλίδας
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(16);
+            pdf.text('Πρόγραμμα Αγώνων - Ορισμοί', margin, yOffset);
+            yOffset += 10;
+
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(10);
+            pdf.text(`Ημερομηνία: ${new Date().toLocaleDateString('el-GR')}`, margin, yOffset);
+            yOffset += 10;
+
+            // Προετοιμασία δεδομένων για τον πίνακα
+            const tableColumn = ["Κατηγορία/Αγωνιστική", "Ημερομηνία/Ώρα", "Γήπεδο", "Αγώνας", "Διαιτητές", "Κομισάριος", "Κριτές"];
+            const tableRows = [];
+
+            // Επανάληψη μέσω των δεδομένων του Google Sheet (global 'data' variable)
+            // Σημαντικό: Εδώ χρησιμοποιούμε την global `data` μεταβλητή που έχει φορτωθεί από το Google Sheet.
+            // Θα πρέπει να φιλτράρετε τα δεδομένα εδώ αν θέλετε μόνο τους φιλτραρισμένους αγώνες στο PDF.
+            // Προς το παρόν, εξάγει ΟΛΑ τα δεδομένα που φορτώθηκαν από το Google Sheet.
+            for (let row = 0; row < posesEggrafes; row++) {
+                const omilosKathgoria = data.getFormattedValue(row, 0);
+                const agvnistikh = data.getFormattedValue(row, 1);
+                const matchDate = data.getFormattedValue(row, 3);
+                const matchTime = data.getFormattedValue(row, 4);
+                const ghpedo = data.getFormattedValue(row, 5);
+                const teamA = data.getFormattedValue(row, 6);
+                const teamB = data.getFormattedValue(row, 7);
+                const diaititis1 = data.getFormattedValue(row, 10);
+                const diaititis2 = data.getFormattedValue(row, 11);
+                const diaititis3 = data.getFormattedValue(row, 12);
+                const komisarios = data.getFormattedValue(row, 55);
+                const kritis1 = data.getFormattedValue(row, 13);
+                const kritis2 = data.getFormattedValue(row, 14);
+                const kritis3 = data.getFormattedValue(row, 15);
+                const status = data.getFormattedValue(row, 2);
+
+                const referees = [diaititis1, diaititis2, diaititis3].filter(Boolean).join(', ') || 'Δεν ορίστηκαν';
+                const judges = [kritis1, kritis2, kritis3].filter(Boolean).join(', ') || 'Δεν ορίστηκαν';
+
+                let matchDisplay = `${teamA} vs ${teamB}`;
+                let date_time_display = `${matchDate} ${matchTime}`;
+
+                if (teamA === "-" || teamB === "-") {
+                    matchDisplay = "ΡΕΠΟ";
+                    // Για ΡΕΠΟ, οι ορισμοί δεν είναι σχετικοί, οπότε μπορούμε να τους θέσουμε κενούς ή παύλες
+                    // referees = "---"; // Αναθέσεις σε const προκαλούν σφάλμα
+                    // komisarios = "---";
+                    // judges = "---";
+                    date_time_display = `${matchDate} ΡΕΠΟ`; // Εμφάνιση "ΡΕΠΟ" στην ώρα
+                } else if (status === "ΤΕΛΙΚΟ") {
+                    const homeScore = data.getFormattedValue(row, 8);
+                    const awayScore = data.getFormattedValue(row, 9);
+                    matchDisplay = `${teamA} (${homeScore}) - (${awayScore}) ${teamB}`;
+                    date_time_display = `ΤΕΛΙΚΟ`; // Εμφάνιση "ΤΕΛΙΚΟ" στην ώρα
+                } else if (status === "ΑΑ") {
+                    matchDisplay = `${teamA} vs ${teamB}`; // Ή ότι άλλο θέλετε για ΑΑ
+                    date_time_display = `ΑΑ`;
+                }
+
+                tableRows.push([
+                    `${omilosKathgoria}\nΑγωνιστική: ${agvnistikh}`,
+                    date_time_display,
+                    ghpedo,
+                    matchDisplay,
+                    referees,
+                    komisarios || 'Δεν ορίστηκε', // Εμφάνιση μηνύματος αν είναι κενό
+                    judges
+                ]);
+            }
+
+            // Χρήση του jspdf-autotable
+            pdf.autoTable({
+                startY: yOffset, // Ξεκινάει κάτω από την κεφαλίδα
+                head: [tableColumn],
+                body: tableRows,
+                theme: 'grid', // 'striped', 'grid', 'plain'
+                styles: {
+                    font: 'helvetica',
+                    fontSize: 8,
+                    cellPadding: 2,
+                    valign: 'middle',
+                    halign: 'center'
+                },
+                headStyles: {
+                    fillColor: [30, 144, 255], // Ένα μπλε χρώμα για την κεφαλίδα
+                    textColor: 255, // Λευκό κείμενο
+                    fontStyle: 'bold',
+                    halign: 'center'
+                },
+                columnStyles: {
+                    // Μπορείτε να ορίσετε πλάτος για συγκεκριμένες στήλες
+                    0: { cellWidth: 30, halign: 'left' }, // Κατηγορία/Αγωνιστική
+                    1: { cellWidth: 25 }, // Ημερομηνία/Ώρα
+                    2: { cellWidth: 30 }, // Γήπεδο
+                    3: { cellWidth: 40 }, // Αγώνας
+                    4: { cellWidth: 30, halign: 'left' }, // Διαιτητές
+                    5: { cellWidth: 20, halign: 'left' }, // Κομισάριος
+                    6: { cellWidth: 30, halign: 'left' }  // Κριτές
+                },
+                didDrawPage: function (data) {
+                    // Προσθήκη κεφαλίδας σε κάθε νέα σελίδα
+                    pdf.setFontSize(10);
+                    pdf.text('Πρόγραμμα Αγώνων - Συνέχεια', data.settings.margin.left, 10);
+                }
+            });
+
+            pdf.save('Πρόγραμμα_Αγώνων_Δεδομένα.pdf');
+        }
+
+        // Προσθήκη event listeners στα κουμπιά μόλις φορτώσει το DOM
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('exportPdfButtonHtml').addEventListener('click', exportMatchesToPdfHtml);
+            document.getElementById('exportPdfButtonData').addEventListener('click', exportMatchesToPdfData);
+        });
 
     </script>
 
@@ -807,7 +929,6 @@
 
         .MatchcenterHomepageWidget__header {
             color: #0f253a;
-            /* font: 400 2.5em / 1 Mansalva, Helvetica, Arial, sans-serif; */ 
             font-family: "Krona One", sans-serif;
             font-weight: 400;
             font-style: normal;
@@ -1149,7 +1270,7 @@
                 /* Μπορεί να χρειαστεί προσαρμογή του πλάτους των στηλών
                 εντός του κεντραρισμένου group για καλύτερη εμφάνιση.
                 Εδώ, τα αφήνουμε όπως είναι για να κρατήσουν το 1/3 πλάτος σε md+.
-                Σε sm-, θα πέσουν σε νέα γραμμή λόγω Bootstrap. */
+                Σε sm-, θα πέψουν σε νέα γραμμή λόγω Bootstrap. */
                 flex: 0 0 auto; /* Επαναφέρει flex-basis: auto */
                 width: auto; /* Επαναφέρει το πλάτος στο αυτόματο */
             }
@@ -1158,12 +1279,10 @@
 
 
         /*/**** Style for the Export PDF button */
-        #exportPdfButton {
-            margin: 20px auto; /* Centering and spacing */
-            display: block; /* To make margin:auto work for centering */
+        .btn-pdf-export { /* Νέα κλάση για τα κουμπιά PDF για ομοιόμορφο στυλ */
+            margin: 20px auto 0 auto; /* Centering and spacing, 0 margin-top for flex container */
             padding: 10px 20px;
             font-size: 1.1em;
-            background-color: #007bff;
             color: white;
             border: none;
             border-radius: 5px;
@@ -1171,10 +1290,21 @@
             transition: background-color 0.3s ease;
         }
 
-        #exportPdfButton:hover {
+        #exportPdfButtonHtml {
+            background-color: #007bff; /* Μπλε για HTML export */
+        }
+        #exportPdfButtonHtml:hover {
             background-color: #0056b3;
         }
-        /**** END Style for the Export PDF button */
+
+        #exportPdfButtonData {
+            background-color: #28a745; /* Πράσινο για Data export */
+        }
+        #exportPdfButtonData:hover {
+            background-color: #218838;
+        }
+
+        /* END Style for the Export PDF button */
 
         /* Κρύψτε το Komisarios column σε οθόνες μικρότερες από το μέσο breakpoint (π.χ. 768px) */
         @media (max-width: 767.98px) { /* Το 767.98px είναι το breakpoint του Bootstrap για sm προς md */
@@ -1185,8 +1315,6 @@
                 width: 33.333333%; /* Για να διατηρηθεί το 1/3 πλάτος */
             }            
         }
-
-
     </style>
 
 </head>
@@ -1211,7 +1339,7 @@
                         <span class="custom-toggle-label-text">ΟΡΙΣΜΟΙ</span>
                     </label>
                 </div>
-                </div>
+            </div>
             <div class="tab-content" id="pills-tabContent">
                 <div class="tab-pane fade show active" id="pills-orismoi" role="tabpanel" aria-labelledby="pills-orismoi-tab" tabindex="0">
                     <div class="filter-section p-3 bg-light rounded mb-3">
@@ -1262,7 +1390,12 @@
                     </div>
                     <div class="container text-center" id="pills-orismoi-container-id">
                     </div>
-                    <button id="exportPdfButton" class="btn btn-primary">Εξαγωγή σε PDF</button>
+                    
+                    <!-- ΝΕΑ ΚΟΥΜΠΙΑ ΕΞΑΓΩΓΗΣ PDF -->
+                    <div class="d-flex justify-content-center gap-3 mt-4">
+                        <button id="exportPdfButtonHtml" class="btn btn-pdf-export">Εξαγωγή σε PDF (HTML)</button>
+                        <button id="exportPdfButtonData" class="btn btn-pdf-export">Εξαγωγή σε PDF (Δεδομένα)</button>
+                    </div>
 
                 </div>
             </div>
@@ -1274,18 +1407,10 @@
 </div>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- script>
-        // Προσθέτουμε event listener στο κουμπί αφού φορτώσει το DOM
-        document.addEventListener('DOMContentLoaded', () => {
-            const exportButton = document.getElementById('exportPdfButton');
-            if (exportButton) {
-                exportButton.addEventListener('click', exportMatchesToPdf);
-            }
-        });
-    </script -->
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" xintegrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" xintegrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAQxS8yBZM0NxN+KwQdWDVABgFTFcVJMiSABlSgk+SPyERowLhBCrGDsow==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- ΝΕΑ Βιβλιοθήκη για jspdf-autotable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/5.0.2/jspdf.plugin.autotable.min.js" integrity="sha512-JizZOUNesiGhMcp9fsA/9W31FOat6QysBM8hSj6ir8iIANIUJ2mhko7Lo1+j0ErftmJ8SebMZLm9iielKjeIEQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </body>
 </html>
