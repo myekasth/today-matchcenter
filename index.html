@@ -733,7 +733,7 @@
             // Τώρα εφαρμόζουμε τα φίλτρα με τη νέα κατάσταση
             applyFilters();
         }        
-        // ΝΕΑ ΛΕΙΤΟΥΡΓΙΑ: Εξαγωγή PDF
+       // ΝΕΑ ΛΕΙΤΟΥΡΓΙΑ: Εξαγωγή PDF
         async function exportMatchesToPdf() {
             // Κρύβουμε προσωρινά στοιχεία που δεν θέλουμε να εμφανιστούν στο PDF, όπως τα φίλτρα
             const filterSection = document.querySelector('.filter-section');
@@ -751,9 +751,9 @@
                 return;
             }
 
-            // Εμφάνιση ενός προσωρινού μηνύματος φόρτωσης (προαιρετικό)
-            const oldHtml = element.innerHTML;
-            element.innerHTML = '<div class="text-center my-5"><div class="spinner-border text-info" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Δημιουργία PDF... Παρακαλώ περιμένετε...</p></div>';
+            // --- ΑΦΑΙΡΕΣΗ: Αυτή η γραμμή προκάλεσε το πρόβλημα (α) ---
+            // const oldHtml = element.innerHTML;
+            // element.innerHTML = '<div class="text-center my-5"><div class="spinner-border text-info" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">Δημιουργία PDF... Παρακαλώ περιμένετε...</p></div>';
 
             try {
                 const canvas = await html2canvas(element, {
@@ -784,11 +784,14 @@
                 console.error("Σφάλμα κατά τη δημιουργία PDF:", error);
                 alert("Προέκυψε σφάλμα κατά τη δημιουργία του PDF. Ελέγξτε την κονσόλα για λεπτομέρειες.");
             } finally {
-                // Επαναφέρουμε το αρχικό HTML περιεχόμενο και τα κρυφά στοιχεία
-                element.innerHTML = oldHtml;
+                // --- ΑΦΑΙΡΕΣΗ: Δεν χρειάζεται πλέον η επαναφορά του innerHTML ---
+                // element.innerHTML = oldHtml;
                 if (filterSection) filterSection.style.display = '';
                 if (toggleSwitch) toggleSwitch.style.display = '';
                 if (exportButton) exportButton.style.display = 'block'; // Εμφάνιση του κουμπιού
+
+                // --- ΠΡΟΣΘΗΚΗ: Καλώντας το applyFilters() για να επαναφέρουμε την κατάσταση των φίλτρων (πρόβλημα β) ---
+                applyFilters();
             }
         }
 
