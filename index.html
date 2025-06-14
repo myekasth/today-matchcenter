@@ -576,6 +576,13 @@
             ekasthDiv.textContent = `Ε.ΚΑ.Σ.Θ. 1976 - ${formattedDateTime}`;
 
             parentElement.appendChild(ekasthDiv);
+
+            
+            const versionDiv = document.createElement('div');
+            versionDiv.classList.add('ekasth-footer-version-text', 'text-center', 'mt-1', 'mb-1'); // Προσθέτουμε κλάσεις για στυλ και κεντράρισμα
+            versionDiv.textContent =`LT v.25.06.14 | today-matchcenter@myekasth`;
+            parentElement.appendChild(versionDiv);
+
             //*** END ΝΕΟ ΚΩΔΙΚΑΣ ΕΔΩ: Προσθήκη της ένδειξης στο τέλος
 
 
@@ -1178,6 +1185,13 @@
                 font-size: 0.75em; /* Μικρή γραμματοσειρά */
                 color: #888;      /* Γκρι χρώμα */
                 margin-top: 15px; /* Μικρή απόσταση από τον τελευταίο αγώνα */
+                /* Το text-center και τα margins θα προστεθούν με τις Bootstrap κλάσεις 'text-center', 'mt-3', 'mb-3' */
+            }
+
+            .ekasth-footer-version-text{
+                font-size: 0.50em; /* Μικρή γραμματοσειρά */
+                color: #888;     /* Γκρι χρώμα */
+                margin-top: 2px; /* Μικρή απόσταση από τον τελευταίο αγώνα */
                 /* Το text-center και τα margins θα προστεθούν με τις Bootstrap κλάσεις 'text-center', 'mt-3', 'mb-3' */
             }
 
